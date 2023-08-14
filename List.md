@@ -2,9 +2,6 @@
 
 ## [160 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/)
 
-| [160. 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/) | 简单 |
-| ------------------------------------------------------------ | ---- |
-
 思路：循环遍历法。假设有 A，B 链，以及 PA 和 PB 指向 A，B 链头结点，PB 先固定不动，PA 循环，比较 PA 与 PB，循环完一轮（即无匹配），则 PB 移动到下一个位置，PA 重新从头开始匹配。后面的重复这样的操作，直到找到匹配项，或者 A，B 链不想交。
 
 ```C++
@@ -34,13 +31,10 @@ public:
 
 ## [21. 合并有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/)
 
-| [21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/) | 简单 |
-| ------------------------------------------------------------ | ---- |
-思路：本题我采用迭代的方式：
-
-- 设置 Prev 为迭代变量
-- list1 或者 list2 为迭代终止条件
-- 迭代关系式
+1. 思路：本题我采用迭代的方式：
+   1. 设置 Prev 为迭代变量
+   2. list1 或者 list2 为迭代终止条件
+   3. 迭代关系式
 
 ```C++
 while(list1 != nullptr || list2 != nullptr)
@@ -515,3 +509,11 @@ public:
 };
 ```
 
+## [148. 排序链表](https://leetcode.cn/problems/sort-list/)
+
+1. 思路
+   1. 本题要求的时间复杂度是 O(nlogn)，如果用类似冒泡的方式（时间复杂度为O(n^2^)）,则超出了时间限制，无法 AC 成功
+   2. 那么既然是 O(nlogn) 的复杂度，则根据排序算法的时间复杂度规律，有归并，堆排和快排可以实现要求，这里采用归并是最合适的方式
+   3. 归并的思路在这里不讲述，归并中，我们采用一个额外的数组来完成此操作，而这里是链表，其实大致的方式是相同的
+
+【注】[二路归并排序](https://zhuanlan.zhihu.com/p/62076299)
