@@ -1,3 +1,7 @@
+# 前言
+
+1. 链表常用的算法技巧：双指针
+
 # 简单
 
 ## [160 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/)
