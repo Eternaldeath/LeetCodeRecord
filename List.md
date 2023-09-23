@@ -466,7 +466,7 @@ public:
 
 1. 思路
 
-   1. 判断相遇：采用快慢指针的方式，快指针每次移动 2 个节点，慢指针每次移动一个节点，二者走过的距离存在如下关系式 ```fastLength = slowLength```，且当快慢指针相遇时，说明存在环路
+   1. 判断相遇：采用快慢指针的方式，快指针每次移动 2 个节点，慢指针每次移动一个节点，二者走过的距离存在如下关系式 ```fastLength = 2 * slowLength```，且当快慢指针相遇时，说明存在环路
    2. 判断入环节点的位置：如下图所示
       1. 快指针走过的距离是 a + n * ( b + c ) +b
       2. 慢指针走过的距离是 a + b
@@ -519,5 +519,135 @@ public:
    1. 本题要求的时间复杂度是 O(nlogn)，如果用类似冒泡的方式（时间复杂度为O(n^2^)）,则超出了时间限制，无法 AC 成功
    2. 那么既然是 O(nlogn) 的复杂度，则根据排序算法的时间复杂度规律，有归并，堆排和快排可以实现要求，这里采用归并是最合适的方式
    3. 归并的思路在这里不讲述，归并中，我们采用一个额外的数组来完成此操作，而这里是链表，其实大致的方式是相同的
+2. 完整示例 ```力扣官方题解```，```未手动实现```
 
-【注】[二路归并排序](https://zhuanlan.zhihu.com/p/62076299)
+```c++
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if (head == nullptr) {
+            return head;
+        }
+        int length = 0;
+        ListNode* node = head;
+        while (node != nullptr) {
+            length++;
+            node = node->next;
+        }
+        ListNode* dummyHead = new ListNode(0, head);
+        for (int subLength = 1; subLength < length; subLength <<= 1) {
+            ListNode* prev = dummyHead, *curr = dummyHead->next;
+            while (curr != nullptr) {
+                ListNode* head1 = curr;
+                for (int i = 1; i < subLength && curr->next != nullptr; i++) {
+                    curr = curr->next;
+                }
+                ListNode* head2 = curr->next;
+                curr->next = nullptr;
+                curr = head2;
+                for (int i = 1; i < subLength && curr != nullptr && curr->next != nullptr; i++) {
+                    curr = curr->next;
+                }
+                ListNode* next = nullptr;
+                if (curr != nullptr) {
+                    next = curr->next;
+                    curr->next = nullptr;
+                }
+                ListNode* merged = merge(head1, head2);
+                prev->next = merged;
+                while (prev->next != nullptr) {
+                    prev = prev->next;
+                }
+                curr = next;
+            }
+        }
+        return dummyHead->next;
+    }
+
+    ListNode* merge(ListNode* head1, ListNode* head2) {
+        ListNode* dummyHead = new ListNode(0);
+        ListNode* temp = dummyHead, *temp1 = head1, *temp2 = head2;
+        while (temp1 != nullptr && temp2 != nullptr) {
+            if (temp1->val <= temp2->val) {
+                temp->next = temp1;
+                temp1 = temp1->next;
+            } else {
+                temp->next = temp2;
+                temp2 = temp2->next;
+            }
+            temp = temp->next;
+        }
+        if (temp1 != nullptr) {
+            temp->next = temp1;
+        } else if (temp2 != nullptr) {
+            temp->next = temp2;
+        }
+        return dummyHead->next;
+    }
+};
+```
+
+4. 时空复杂度
+   1. 时间复杂度：O(nlogn)
+   2. 空间复杂度：O(1)
+5. 拓展与补充：[二路归并排序](https://zhuanlan.zhihu.com/p/62076299)
+
+## [287. 寻找重复数](https://leetcode.cn/problems/find-the-duplicate-number/)
+
+1. 思路：本题有多种解题思路（二分法，位运算），该例子采用快慢指针的方式完成。具体思路参考[这里](https://leetcode.cn/problems/find-the-duplicate-number/solutions/58841/287xun-zhao-zhong-fu-shu-by-kirsche/)。
+2. 注意点：本身快慢指针在链表中，指针移动的方式是
+
+```c++
+slow = slow->next;
+fast = fast->next->next;
+```
+
+​	但本题是数组，它的移动方式应该改成这样
+
+```C++
+slow = nums[slow];
+fast = nums[nums[fast]];
+```
+
+​	至于为啥是这么做的，是因为这里有一个映射关系，假设有数组 [1, 3, 2, 4, 4]，其下标和具体值有如下映射关系 n->f(n)，其中 n 为下标，每一次下标 n 通过映射关系 f(n) 计算出的新值作为新下标，所以可得如下
+
+```bash
+0 ->f(0) = 1
+1 ->f(1) = 3
+2 ->f(2) = 2
+3 ->f(3) = 4
+4 ->f(4) = 4
+```
+
+​	然后我们把上面的下标拉通：0->1->3->4->4->4 ...，可以看到 4 的位置出现了循环。
+
+3. 完整示例 ```精选题解```，```未手动实现```
+
+```C++
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        int slow = 0;
+        int fast = 0;
+
+        // 注意：slow 和 fast 此时代表下标
+        // nums[slow] 和 nums[fast] 代表具体的数值
+
+        // 先执行一次，避免初次判断 slow != fast
+        slow = nums[slow];
+        fast = nums[nums[fast]];
+        while(slow != fast){
+            slow = nums[slow];
+            fast = nums[nums[fast]]; // fast 走两步
+        }
+
+        int pre1 = 0;
+        while(pre1 != slow){
+            pre1 = nums[pre1];
+            slow = nums[slow];
+        }
+        return pre1;
+    }
+};
+```
+

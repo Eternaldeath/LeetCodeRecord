@@ -8,24 +8,31 @@
 
 1. 参考题库
    1. 🔥 LeetCode 热题 HOT 100
+   1. 剑指 Offer
 
 |                           题目类型                           | 简单题目数量 | 中等题目数量 | 困难题目数量 |
 | :----------------------------------------------------------: | :----------: | :----------: | :----------: |
-|                             数组                             |              |              |              |
-| [链表](https://github.com/Eternaldeath/LeetCodeRecord/blob/master/List.md) |      5       |      6       |      0       |
-| [二叉树](https://github.com/Eternaldeath/LeetCodeRecord/blob/master/Binary_tree.md) |      0       |      0       |      0       |
-|                           动态规划                           |      0       |      0       |      0       |
+| [数组](https://github.com/Eternaldeath/LeetCodeRecord/blob/master/Array.md) |      3       |      2       |      0       |
+| [链表](https://github.com/Eternaldeath/LeetCodeRecord/blob/master/List.md) |      5       |      7       |      0       |
+| [二叉树](https://github.com/Eternaldeath/LeetCodeRecord/blob/master/Binary_tree.md) |      6       |      7       |      0       |
+| [动态规划](https://github.com/Eternaldeath/LeetCodeRecord/blob/master/Dynamic_Programming.md) |      0       |      1       |      0       |
+|                            哈希表                            |              |              |      0       |
+|                            栈队列                            |              |              |              |
+|                            字符串                            |              |              |              |
+|                             排序                             |              |              |              |
+|                         深度优先搜索                         |              |              |              |
+|                         广度优先搜索                         |              |              |              |
 
 # 基本算法技巧，算法思想与对应的数据结构
 
-| 算法技巧或算法思想                       | 数据结构     |
-| ---------------------------------------- | ------------ |
-| 【技巧】双指针（如，快慢指针，左右指针） | 数组，链表   |
-| 【技巧】二分查找                         | 数组         |
-| 【技巧】滑动窗口（如，快慢指针）         | 数组，字符串 |
-| 【技巧】前缀和                           | 数组         |
-| 【技巧】差分数组                         | 数组         |
-| 【思想】递归（包含回溯算法，动态规划）   | 树，二叉树   |
+| 算法技巧或算法思想                                 | 数据结构     |
+| -------------------------------------------------- | ------------ |
+| 【技巧】双指针（如，快慢指针，左右指针，滑动窗口） | 数组，链表   |
+| 【技巧】二分查找                                   | 数组         |
+| 【技巧】滑动窗口（如，快慢指针）                   | 数组，字符串 |
+| 【技巧】前缀和                                     | 数组         |
+| 【技巧】差分数组                                   | 数组         |
+| 【思想】递归（包含回溯算法，动态规划）             | 树，二叉树   |
 
 【注】回溯算法本质是一棵多叉树
 
