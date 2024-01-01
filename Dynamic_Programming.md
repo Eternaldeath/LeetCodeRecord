@@ -1,6 +1,59 @@
-> 动态规划问题的整体解决方案，我参考的是《代码随想录》的解题思路
+# 前言
+
+1. 什么时候采用一维 dp table，什么时候采用二维 dp table：一般单个字符串或数组采用一维，两个字符串，两个数组和二维表格采用二维
+2. 子序列问题
+   1. 连续：该种情况下仅考虑状态转移为 dp\[i][j] = dp\[i-1][j-1] + 1（or dp[i] = dp[i] + 1)，因为考虑的是连续情况，而 dp\[i][j] 的含义是在数组 A 的 i 位置和数组 B 的 j 位置的时的最值问题。如 718 题目
+   2. 不连续：该种情况除了考虑“连续”的问题，还要考虑不连续的问题，因此分裂为两个子问题，则需要按照如下代码进行分别考虑
+
+```c++
+if(text1[i-1] = text2[j-1]){
+    dp[i][j] = dp[i-1][j-1] + 1;
+}else{
+    dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+}
+```
+
+
 
 # 基础题目
+
+[64. 最小路径和_中等](https://leetcode.cn/problems/minimum-path-sum/)
+
+1. 思路：直接上动规五部曲
+   1. dp 数组：因为是二维的表格，所以设置为 dp\[i][j]，表示在 [i, j] 这个位置时的最小路径和
+   2. 递推公式：dp\[i][j] 的状态要么是从它上方的表格来，要么是从它左边的表格来，选择上方或左边的最小值，所以`dp[i][j] = min(dp[i][j - 1], dp[i - 1][j]) + grid[i][j];`
+   3. 数组的初始化：对于 dp\[0][0] 来说，按照 dp 数组的定义，它应该取值二维表格的 [0, 0] 位置的值，题目中二维表格为 grid，所以有 `dp[0][0] = grid[0][0];`
+   4. 遍历顺序：考虑边界情况
+      1. 首先首行的 dp\[0][j] 一定是从左边的表格递推过来的。同理，首列的  dp\[i][0] 值一定是从上面的表格递推过来的，因此我们先填满它们
+      2. 然后其余的表格按照从左至右，从上至下的顺序填满
+2. 注意点：-
+3. 完整示例 `hello 算法题解`
+
+```c++
+int minPathSumDP(vector<vector<int>> &grid) {
+    int n = grid.size(), m = grid[0].size();
+    // 初始化 dp 表
+    vector<vector<int>> dp(n, vector<int>(m));
+    dp[0][0] = grid[0][0];
+    // 状态转移：首行
+    for (int j = 1; j < m; j++) {
+        dp[0][j] = dp[0][j - 1] + grid[0][j];
+    }
+    // 状态转移：首列
+    for (int i = 1; i < n; i++) {
+        dp[i][0] = dp[i - 1][0] + grid[i][0];
+    }
+    // 状态转移：其余行列
+    for (int i = 1; i < n; i++) {
+        for (int j = 1; j < m; j++) {
+            dp[i][j] = min(dp[i][j - 1], dp[i - 1][j]) + grid[i][j];
+        }
+    }
+    return dp[n - 1][m - 1];
+}
+```
+
+4. 时间复杂度：O(n*m)；空间复杂度：O(n\*m)
 
 ## [70. 爬楼梯_简单](https://leetcode.cn/problems/climbing-stairs/)
 
@@ -211,6 +264,48 @@ public:
 ## [474. 一和零](https://leetcode.cn/problems/ones-and-zeroes/)
 
 1. 思路：本题题解看[这里](https://programmercarl.com/0474.%E4%B8%80%E5%92%8C%E9%9B%B6.html#%E6%80%9D%E8%B7%AF)
+
+## [416. 分割等和子集_中等](https://leetcode.cn/problems/partition-equal-subset-sum/)
+
+1. 思路：参考[本篇文章](https://www.yuque.com/fromdark/yx0hps/swqwhsrw7v29ar0g#CWOTW)和[分割等和子集](https://programmercarl.com/0416.%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86.html#%E7%AE%97%E6%B3%95%E5%85%AC%E5%BC%80%E8%AF%BE)
+2. 注意点：dp table 下标是从 0 开始的，而物品的下标是从 1 开始的，所以需要用 nums[i-1] 来进行对位匹配
+3. 完整示例
+
+```c++
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) {
+        int sum = 0;
+        for(int i = 0; i < nums.size(); i++){
+            sum += nums[i];
+        }
+
+        if(sum % 2 ==1) return false;
+        // 因为是分割等和子集，所以只要数组中的内容能满足和的一半，则另一半自动满足
+        int target = sum / 2;
+
+        // dp table 首行，首列都是从 0 开始
+        vector<vector<int>> dp(nums.size() + 1, vector<int>(target + 1, 0));
+
+        for(int i = 1; i <= nums.size(); i++){
+            for(int j = 1; j <= target; j++){
+                if(nums[i-1] > j){
+                    dp[i][j] = dp[i-1][j];
+                }
+                else{
+                    dp[i][j] = max(dp[i-1][j], dp[i-1][j-nums[i-1]] + nums[i-1]);
+                }
+                
+            }
+        }
+
+        if(dp[nums.size()][target] == target) return true;
+        return false;
+    }
+};
+```
+
+4. 时间复杂度：O(n\*m)；空间复杂度：O(n\*m)
 
 # 完全背包系列
 
@@ -431,7 +526,38 @@ int maxProfit_k_1(vector<int>& prices) {
 
 1. 注意：子序列和子串是有区别的，子序列若无特殊说明是指非连续的序列，举例如下，在 `nums[1,2,1,3,10,2,15]` 中，其中的最长递增子序列是 `[1,3,10,15]`，可以看到中间允许中断
 
-## [674. 最长连续递增序列_简单](https://leetcode.cn/problems/longest-continuous-increasing-subsequence/)
+## 子序列连续情况
+
+### [53. 最大子数组和_中等](https://leetcode.cn/problems/maximum-subarray/)
+
+1. 思路：直接套用动规五部曲
+   1. dp 数组和下标的含义：dp 数组表示下标为 i 时的最大连续子数组的和
+   2. 递推公式：dp[i] = max(dp[i-1], dp[i-1]+nums[i]);，表示 i 位置的最大值，如果 nums[i] 为负数，则 dp[i-1] 为最大值，否则 dp[i-1] 再加上当前位置上的正数（即，nums[i]）为最大值
+   3. 初始化：dp[0] 取 nums[0]
+   4. 遍历顺序：从前往后
+2. 注意点：-
+3. 完整示例 `代码随想录题解`
+
+```c++
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        if (nums.size() == 0) return 0;
+        vector<int> dp(nums.size());
+        dp[0] = nums[0];
+        int maxValue = dp[0];
+        for (int i = 1; i < nums.size(); i++) {
+            dp[i] = max(dp[i - 1] + nums[i], nums[i]); 
+            if (dp[i] > maxValue) maxValue = dp[i]; 
+        }
+        return maxValue;
+    }
+};
+```
+
+4. 时间复杂度：O(n)；空间复杂度：O(n)；
+
+### [674. 最长连续递增序列_简单](https://leetcode.cn/problems/longest-continuous-increasing-subsequence/)
 
 1. 思路：我们只需要比较相邻两个数字的大小即可，具体思路见[这里](https://programmercarl.com/0674.%E6%9C%80%E9%95%BF%E8%BF%9E%E7%BB%AD%E9%80%92%E5%A2%9E%E5%BA%8F%E5%88%97.html#%E6%80%9D%E8%B7%AF)。同时自己画一幅图，跟着代码跑一遍
 2. 注意点：-
@@ -461,27 +587,64 @@ public:
    1. 时间复杂度：O(n)
    2. 空间复杂度：O(1)
 
+### [718. 最长重复子数组_中等](https://leetcode.cn/problems/maximum-length-of-repeated-subarray/)
+
+1. 思路：本题是子数组，且题目说明了连续，则我们考虑状态转移为“前言_子序列问题\_连续。同时，因为有两个数组进行比较，则 dp table 我们设置为二维的
+2. 注意点：-
+3. 完整示例 `代码随想录题解`
+
+```C++
+class Solution {
+public:
+    int findLength(vector<int>& nums1, vector<int>& nums2) {
+        int result = 0;
+        vector<vector<int>> dp(nums1.size()+1, vector<int>(nums2.size()+1, 0));
+        for(int i = 1; i <= nums1.size(); i++){
+            for(int j = 1; j <= nums2.size(); j++){
+                if(nums1[i-1] == nums2[j-1]) dp[i][j] = dp[i-1][j-1] + 1;
+
+                if (dp[i][j] > result) result = dp[i][j];
+            }
+        }
+
+        return result;
+    }
+};
+```
+
+4. 时间复杂度：O(n\*m)，n 和 m 为数组的长度；空间复杂度:O(n\*m)
+
 ## [300. 最长递增子序列_中等](https://leetcode.cn/problems/longest-increasing-subsequence/)
 
-2. 思路：利用动归五部曲来分析
+1. 思路：利用动归五部曲来分析
 
-   1. dp[i] 数组及下标的含义：有原数组 nums[]，其中 i 表示原数组的下标，即第 i 个元素，dp[i] 表示以 nums[i] 为结尾的最大递增子序列，它包含了 nums[i] 的位置
-   2. 递推公式
+   1. dp[i] 数组及下标的含义：有原数组 nums[]，其中 i 表示原数组的下标，即第 i 个元素，**dp[i] 表示以 nums[i] 为结尾的最大递增子序列**，它包含了 nums[i] 的位置
 
-   ```c++
-   for(int i = 0; i < nums.size(); i++){
-       for(int j = 0; j < i; j++){
-           if(nums[i] > nums[j]) dp[i] = max(dp[i], dp[j] + 1);
-       }
-   }
-   ```
+   1. 递推公式
+      1. 两层 for 循环：其中 i 用于定位当前 dp 数组的遍历到的位置。而 j 用来比较 dp[i] 与 dp[j] 的大小，每一轮（即外层 for 循环 i++）后，j 都会从 0 开始到 i-1 比较已有 dp 数组上的值（记录的该位置的最大子序列）与本轮中 dp[i] 的大小
+      2. `dp[i] = max(dp[i], dp[j] + 1)` 的含义是，在当前轮次中，比较 i 位置和 j 位置的 dp 记忆包的大小，并选择其中大的
+         1. 若 dp[i] 大，表示以 nums[i] 结尾的递增子序列更长
+         2. 若 dp[j]+1 大，表示以 nums[j] 结尾的递增子序列加上当前 nums[i] 之后更长
+         3. 注意：j 是从 0 到 i-1，而不是 j = i-1
 
-   3. dp 数组初始化：显然长度必然包含自己，于是初始化为 1
-   4. 遍历顺序：如递推公式所示
+      3. 注意：整个过程手动模拟一下会更容易理解
 
-3. 注意点：-
+2. 注意点：dp 数组的作用就是记忆包，相比于暴力的 for 循环，它记录了每一轮 i 轮次得到的最大子序列，并用于在后期的比较中，而不用每一轮都重新计算
 
-4. 完整示例 `算法小抄题解`
+```c++
+for(int i = 0; i < nums.size(); i++){
+    for(int j = 0; j < i; j++){
+        if(nums[i] > nums[j]) dp[i] = max(dp[i], dp[j] + 1);
+    }
+}
+```
+
+3. dp 数组初始化：显然长度必然包含自己，于是初始化为 1
+4. 遍历顺序：如递推公式所示
+
+2. 注意点：-
+
+3. 完整示例 `算法小抄题解`
 
 ```c++
 class Solution {
@@ -550,7 +713,155 @@ public:
    1. 时间复杂度：O(n^2^)
    2. 空间复杂度：O(1)
 
-## [647. 回文子串_中等](https://leetcode.cn/problems/palindromic-substrings/)
+## [1035. 不相交的线_中等](https://leetcode.cn/problems/uncrossed-lines/)
+
+1. 思路：本题和 1143 考察的内容完全一样，其实就是找最长公共子序列，你只需要把这个本题的逻辑转换成最长公共最序列就好。如下图所示，就是两个数组的最长子序列为 [1,4]，长度为 2，也就是最多不想交线为 2
+
+![](.\img\dp\1135_01.png)
+
+2. 注意点：本题的代码和 1143 几乎一致，就不再贴代码了
+
+## [1143. 最长公共子序列_中等](https://leetcode.cn/problems/longest-common-subsequence/)
+
+1. 思路
+   1. dp 数组的定义
+      1. dp 数组在本例中表示在当前位置存在的最长公共子序列，首先由于是两个子数组，所以我们一开始定义 dp 数组的时候是二维的，其中横方向为 text1，纵方向为 text2
+      2. dp\[i][0] 的含义：表示 text1 在下标为 i 位置和 text2 在下标为 0 位置相比较时的最长公共子序列
+   2. 递推公式
+      1. 我们选取中间某个位置进行比较，若有 text[i-1] = text[j-1] 则说明此此处为新的相同元素，那么该位置更新最长子序列是 dp\[i-1][j-1] 位置处的值再加一（PS，在代码随想录中，它选择了用 [0, i-1] 来定义子序列的范围
+      2. 我们选取中间某个位置进行比较，若有 text[i-1] ≠ text[j-1] 则我们将 dp\[i][j-1] 或 dp\[i-1][j] 中的最大值拷贝过来，它的含义可以从下面的图中了解到
+
+```c++
+for(int i = 1; i < text1.size(); i++){
+    for(int j = 1; j < text2.size(); j++){
+        if(text1[i-1] = text2[j-1]){
+            dp[i][j] = dp[i-1][j-1] + 1;
+        }else{
+            dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+}
+```
+   3. dp 数组初始化，dp\[i][0] 表示 text1 在下标为 i 和 text2 在下标为 0 中最长公共子序列，所以 dp 记录的最大公共子序列为 0，同理 dp\[0][j] 也为 0
+   4. 遍历顺序：**从上往下，从左往右**，每个 dp 单元可以从三个方向推出，具体见下方图片
+
+![](.\img\dp\1143_01.jpg)
+
+2.  注意点：-
+3. 完整示例 `代码随想录题解`
+
+```C++
+class Solution {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        vector<vector<int>> dp(text1.size() + 1, vector<int>(text2.size() + 1, 0));
+        // 注意，这里是 <=
+        for(int i = 1; i <= text1.size(); i++){
+            for(int j = 1; j <= text2.size(); j++){
+                if(text1[i - 1] == text2[j - 1]) dp[i][j] = dp[i-1][j-1] + 1;
+                else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+
+        return dp[text1.size()][text2.size()];
+    }
+};
+```
+
+4. 时间复杂度：O(n*m)，其中 n，m 为 text1,2 的长度；空间复杂度：O(n\*m)，表示 dp table 的大小
+
+## 编辑距离
+
+### [583. 两个字符串的删除操作_中等](https://leetcode.cn/problems/delete-operation-for-two-strings/)
+
+1. 思路：本题的大体思路同 [Hello 算法中介绍的编辑距离的解题通用思路](https://www.hello-algo.com/chapter_dynamic_programming/edit_distance_problem/#146)类似，不过这里我们仅考虑编辑操作为删除的情况。同时本题的一个变体点在于，常规的编辑距离问题是从一个字符串不动，另一个字符串进行编辑操作，进而变成不动的那个，而本题两个字符串都可以进行操作，因此在递推公式的部分，我们需要对其含义进行修正
+
+   1. dp\[i][j] 的定义：它表示在字符串（s）和字符串（t）分别位于 i 和 j 位置时，让两个字符串变得一样需要的最小操作数量。举例来说，假设有字符串 "a" 和 字符串 "b"（此时 i 为 1，j 为 1），让两字符串变得一样，则最小的操作数是 2，即分别删除 a 和 b
+
+   2. 递推公式：按照编辑距离的常规思路（见 [Hello 算法](https://www.hello-algo.com/chapter_dynamic_programming/edit_distance_problem/#146)），我们需要对上述情形进行两层分类，第一层是若 s[i] 和 t[j] 对应的字符是否相同，若相同则跳过，若不同则处理。第二层是如何处理，传统的处理方式为替代，删除和增加，而本题仅能删除，具体操作见下方
+
+      1. 若 s[i] 和 t[j] 相同：dp\[i][j] = dp\[i-1][j-1]
+
+      2. 若 s[i] 和 t[j] 不相同，则考虑三种情况，分别如下。最后 +1 操作表示增加本次操作
+
+         1. 删除 s 的当前字符使得整体操作步骤最小：dp\[i][j] = dp\[i-1][j] + 1
+         2. 删除 t 的当前字符使得整体操作步骤最小：dp\[i][j] = dp\[i][j-1] + 1
+
+      3. 综上递推公式为
+
+         ```c++
+                 for(int i = 1; i <= w1Size; ++i){
+                     for(int j = 1; j <= w2Size; ++j){
+                         // 注意此处的下标，由于我们的 dp table 在横向和竖向
+                         // 增加了一行一列，但我们的 word 字符串还是要从下标
+                         // 为 0 的位置开始
+                         if(word1[i-1] == word2[j-1]){
+                             dp[i][j] = dp[i-1][j-1];
+                         }else{
+                             dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + 1;
+                         }
+                     }
+                 }
+         ```
+
+   3. 初始化 dp\[i][j]
+
+      1. dp\[0][0]：表示 s 和 t 都为空的时候，二者变得一样的步骤次数，显然不需要进行任何步骤，所以为 0
+      2. dp\[i][0]：表示 s 存在而 t 为空的时候， 二者变得一样的步骤次数，其实就是把 s 的字符全部删除干净，所以 dp\[i][0] = i
+      3. dp\[0][j]：表示 t 存在而 s 为空的时候， 二者变得一样的步骤次数，其实就是把 t 的字符全部删除干净，所以 dp\[0][j] = j
+
+   4. 遍历顺序：参考代码随想录的题解，我们知道遍历顺序从上至下，从左至右，因此使用两层正向 for 循环
+
+2. 注意点：-
+
+3. 完整示例
+
+```c++
+class Solution {
+public:
+    int minDistance(string word1, string word2) {
+        int w1Size = word1.size();
+        int w2Size = word2.size();
+
+        // 注意为 dp table 增加一行和一列，具体见 Hello 算法里面的图片
+        vector<vector<int>> dp(w1Size + 1, vector<int>(w2Size + 1));
+
+        // 初始化 dp table
+        dp[0][0] = 0;
+        for(int i = 1; i <= w1Size; ++i){
+            dp[i][0] = i;
+        }
+        for(int j = 1; j <= w2Size; ++j){
+            dp[0][j] = j;
+        }
+
+        // 递推公式
+        for(int i = 1; i <= w1Size; ++i){
+            for(int j = 1; j <= w2Size; ++j){
+                // 注意此处的下标，由于我们的 dp table 在横向和竖向
+                // 增加了一行一列，但我们的 word 字符串还是要从下标
+                // 为 0 的位置开始
+                if(word1[i-1] == word2[j-1]){
+                    dp[i][j] = dp[i-1][j-1];
+                }else{
+                    dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + 1;
+                }
+            }
+        }
+
+        return dp[w1Size][w2Size];
+
+    }
+};
+```
+
+4. 时空复杂度：O(n\*m)
+
+
+
+## 回文
+
+### [647. 回文子串_中等](https://leetcode.cn/problems/palindromic-substrings/)
 
 1. 思路：本题利用二维动态规划来解决
    1. 首先，我们确定有三种情况会出现回文。针对前两种回文好判断，但第三种我们很难通过一维 dp 数组来建立递推关系式，实际上，我们这么来看第三种情况，若有 'acbca' 是回文，则 'cbc' 是回文，则 'b' 是回文，当我们从 'b' 扩展出来时，是需要判断 'b' 两边的 'c' 是否相同，于是如下图所示，我们要判断 [i, j] 是否回文，则先判断 [i+1, j-1] 是否回文，然后判断 i+1 的值是否等于 j-1
@@ -615,11 +926,4 @@ public:
 二维 dp 判断逻辑在原数组上的的图示过程
 
 ![](.\img\dp\647_03.png)
-
-   
-
-   
-
-
-​					
 

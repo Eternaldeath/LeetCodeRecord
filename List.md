@@ -108,7 +108,7 @@ public:
 
 1. 思路：本题我采用迭代的方式：
    1. 设置 Cur 为迭代变量
-   2. Cur ！= nullptr 为迭代终止条件
+   2. Cur  !=  nullptr 为迭代终止条件
    3. 以及如下的迭代关系式
 
 ```c++
@@ -462,6 +462,63 @@ public:
 };
 ```
 
+## [138. 随机链表的复制](https://leetcode.cn/problems/copy-list-with-random-pointer/)
+
+1. 思路：本题的难点在于如何在构建新表的时候完成 `random` 指针的指向问题，于是选择采用哈希表的方式，然后按照如下步骤执行：
+   1. 先进行第一次遍历，将每一个原链表的节点和新链表的节点在哈希表（map）做映射（且二者是完全相同的）。这样，在执行下一步时，所有的节点就都有了。
+   2. 然后在 map 上执行新链表的连接操作，如下图所示。
+
+![](.\img\list\138_01.jpg)
+
+2. 注意点：-
+3. 完整示例
+
+```c++
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+*/
+
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        if(head == nullptr) return head;
+        Node* cur = head;
+        unordered_map<Node*, Node*> map;
+
+        // 原节点和新节点建立 map 映射
+        while(cur != nullptr){
+            map.insert(make_pair(cur, new Node(cur->val)));
+            cur = cur->next;
+        }
+
+        cur = head;
+
+        // 利用 map 中的已有的且独立的新节点构建新节点的链表
+        while(cur != nullptr){
+            map[cur]->next   = map[cur->next];
+            map[cur]->random = map[cur->random];
+            cur = cur->next;
+        }
+
+        return map[head];
+    }
+};
+```
+
+4. 时间复杂度：O(n)；空间复杂度：O(n)；
+
 ## [142. 环形链表 II](https://leetcode.cn/problems/linked-list-cycle-ii/)
 
 1. 思路
@@ -591,6 +648,37 @@ public:
    1. 时间复杂度：O(nlogn)
    2. 空间复杂度：O(1)
 5. 拓展与补充：[二路归并排序](https://zhuanlan.zhihu.com/p/62076299)
+
+## [237. 删除链表中的节点](https://leetcode.cn/problems/delete-node-in-a-linked-list/)
+
+1. 思路：常规思路是，我们要删除一个链表中的节点，那么首先是找到这个节点的前驱节点，然后用前驱节点越过被删除节点指向后续节点。但是本题中，我们不知道被删除节点的前驱节点，因此无法采用这种方式。
+
+​	但我们可以用另一种方式，及用被删除节点的后续节点的值取代被删除节点，这样链表中就有两个一模一样	的节点了（题目保证了每个节点值的唯一性），然后再把这个后续节点删除，这样也实现了删除节点的操	作。
+
+![](.\img\list\237_01.jpg)
+
+2. 注意点：题目保证了值的唯一性，保证了节点不会是尾节点
+3. 完整示例
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    void deleteNode(ListNode* node) {
+        node->val = node->next->val;
+        node->next = node->next->next;
+    }
+};
+```
+
+4. 时空复杂度：O(1)；
 
 ## [287. 寻找重复数](https://leetcode.cn/problems/find-the-duplicate-number/)
 

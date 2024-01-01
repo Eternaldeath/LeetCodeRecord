@@ -3,7 +3,7 @@
 1. 描述：回溯问题本质就是在一棵决策树上，在叶子节点“采摘”合法的结果。关于回溯问题的基本原理，看[这里](https://www.yuque.com/fromdark/yx0hps/oyke34248lhubkyy)
 2. 回溯问题模板
 
-```c++
+```python
 result = []
 def backtrack(路径, 选择列表):
     if 满足结束条件:
@@ -100,7 +100,113 @@ private:
 
 4. 时间复杂度：O(n!)；空间复杂度：O(n)
 
+## [216. 组合总和 III](https://leetcode.cn/problems/combination-sum-iii/)
+
+1. 思路：-
+2. 注意点：-
+3. 完整示例
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> combinationSum3(int k, int n) {
+        int tempSum = 0;
+        backtrack(track, 1, k, n, tempSum);
+
+        return res;
+    }
+
+    void backtrack(vector<int>& track, 
+                   int startIndex,
+                   int k,
+                   int n,
+                   int& tempSum){
+        if(track.size() == k){
+            if(tempSum == n) res.push_back(track);
+            return ;
+        }
+
+        for(int i = startIndex; i <= 9; i++){
+            // if(tempSum > n) break;
+
+            track.push_back(i);
+            tempSum += i;
+            backtrack(track, i + 1, k, n, tempSum);
+            track.pop_back();
+            tempSum -= i;
+        }
+    }
+private:
+    vector<vector<int>> res;
+    vector<int> track;
+};
+```
+
+4. 时间复杂度：O(n * 2^n)；空间复杂度：O(n)
+
 # 分割系列问题
+
+## [93. 复原 IP 地址](https://leetcode.cn/problems/restore-ip-addresses/)
+
+1. 思路：要分析出这是和 131 类似的题目
+2. 注意点：本题的比较复杂，需要把大问题分解成几个小问题来解决（比如判断是否合法的模块），而不是写在一堆
+3. 完整示例 `代码随想录题解`，`未手动实现`
+
+```c++
+class Solution {
+private:
+    vector<string> result;// 记录结果
+    // startIndex: 搜索的起始位置，pointNum:添加逗点的数量
+    void backtracking(string& s, int startIndex, int pointNum) {
+        if (pointNum == 3) { // 逗点数量为3时，分隔结束
+            // 判断第四段子字符串是否合法，如果合法就放进result中
+            if (isValid(s, startIndex, s.size() - 1)) {
+                result.push_back(s);
+            }
+            return;
+        }
+        for (int i = startIndex; i < s.size(); i++) {
+            if (isValid(s, startIndex, i)) { // 判断 [startIndex,i] 这个区间的子串是否合法
+                s.insert(s.begin() + i + 1 , '.');  // 在i的后面插入一个逗点
+                pointNum++;
+                backtracking(s, i + 2, pointNum);   // 插入逗点之后下一个子串的起始位置为i+2
+                pointNum--;                         // 回溯
+                s.erase(s.begin() + i + 1);         // 回溯删掉逗点
+            } else break; // 不合法，直接结束本层循环
+        }
+    }
+    // 判断字符串s在左闭又闭区间[start, end]所组成的数字是否合法
+    bool isValid(const string& s, int start, int end) {
+        if (start > end) {
+            return false;
+        }
+        if (s[start] == '0' && start != end) { // 0开头的数字不合法
+                return false;
+        }
+        int num = 0;
+        for (int i = start; i <= end; i++) {
+            if (s[i] > '9' || s[i] < '0') { // 遇到非数字字符不合法
+                return false;
+            }
+            num = num * 10 + (s[i] - '0');
+            if (num > 255) { // 如果大于255了不合法
+                return false;
+            }
+        }
+        return true;
+    }
+public:
+    vector<string> restoreIpAddresses(string s) {
+        result.clear();
+        if (s.size() < 4 || s.size() > 12) return result; // 算是剪枝了
+        backtracking(s, 0, 0);
+        return result;
+    }
+};
+
+```
+
+4. 时间复杂度：O(3^4^)；空间复杂度：O(n);
 
 ## [131. 分割回文串](https://leetcode.cn/problems/palindrome-partitioning/)
 
@@ -209,6 +315,46 @@ private:
 
 4. 时间复杂度：O(n!)；空间复杂度：O(n)
 
+## [90. 子集 II](https://leetcode.cn/problems/subsets-ii/)
+
+1. 思路：
+2. 注意点：-
+3. 完整示例
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        vector<int> used(nums.size(), 0);
+        sort(nums.begin(), nums.end());
+        res.push_back(vector<int>());
+        backtrack(nums, used, 0);
+        return res;
+    }
+
+    void backtrack(vector<int>& nums, vector<int>& used, int cur){
+        if(cur == nums.size()) return ;
+
+        for(int i = cur; i < nums.size(); i++){
+            if(i >0 && nums[i] == nums[i-1] && used[i-1] == 0) continue;
+
+            track.push_back(nums[i]);
+            used[i] = 1;
+            res.push_back(track);
+            backtrack(nums, used, i + 1);
+            track.pop_back();
+            used[i] = 0;
+        }
+    }
+private:
+    vector<vector<int>> res;
+    vector<int> track;
+    int cur;
+};
+```
+
+4. 时间复杂度：
+
 # 排列系列问题
 
 ## [46. 全排列_中等](https://leetcode.cn/problems/permutations/)
@@ -264,6 +410,56 @@ private:
 ```
 
 4. 时间复杂度：O(n!)；空间复杂度：O(n)
+
+## [47. 全排列 II_中等](https://leetcode.cn/problems/permutations-ii/)
+
+1. 思路：本题和 46 题的区别在于，它给出的数组中存在重复的数字，比如 [1,1,2]，这里数组的前两项就重复了，因此我们需要对其进行去重操作。其去重的核心代码如下，意思就是，如果满足当前操作的数字和前一个数字相同且前一个数字已经没有被使用，那么判定为重复
+
+   ![](.\img\backtrack\47_01.png)
+
+```C++
+if(i > 0 && nums[i-1] == nums[i] &&  used[i-1] == 0) continue;
+```
+
+2. 注意点：-
+3. 完整示例 `代码随想录题解`
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<int> uesd(nums.size(), 0);
+        sort(nums.begin(), nums.end()); // 排序
+        backtrack(nums, track, uesd);
+        return res;
+    }
+
+    void backtrack(vector<int>& nums, 
+                   vector<int>& track,
+                   vector<int>& used){
+        if(track.size() == nums.size()){
+            res.push_back(track);
+            return ;
+        }
+
+        for(int i = 0; i < nums.size(); i++){
+            if(i > 0 && nums[i-1] == nums[i] &&  used[i-1] == 0) continue;
+            if(used[i] == 1) continue;
+
+            track.push_back(nums[i]);
+            used[i] = 1;
+            backtrack(nums, track, used);
+            track.pop_back();
+            used[i] = 0;
+        }
+    }
+private:
+    vector<vector<int>> res;
+    vector<int> track;
+};
+```
+
+
 
 # 棋盘问题
 
@@ -335,3 +531,66 @@ public:
 ```
 
 4. 时间复杂度：O(n!)；空间复杂度：O(n)
+
+# 其他
+
+## [491. 递增子序列_中等](https://leetcode.cn/problems/non-decreasing-subsequences/)
+
+1. 思路
+   1. 终止条件：本题中其实无需设置终止条件，因为递归中 startIndex 会有 +1 操作，不会无限递归。但是在终止条件的地方，可以添加 push_back 操作，即当子序列的长度 >= 2 的时候，将其放入结果 vector 中
+   2. 去重的逻辑：本题中去重出现在同一层次，若出现了相同的子序列组合应该去重，但不同层次不存在去重，如下图。针对这种本层需要去重，但不同层不需要去重的情况，可以使用在 for 循环中添加 unordered_set 的方式，并且不对其进行任何 pop 操作，因为其出现在每轮的 for 循环中，而进入递归的下一层 for 循环不会受到影响，如下面的代码
+
+![](.\img\array\419_01.png)
+
+```c++
+// 单层搜索
+unordered_set<int> uset; // 在每一层设置新的 set，当递归进入下一层时，程序定义的是新的 set
+for (int i = startIndex; i < nums.size(); i++) {
+    if ((!path.empty() && nums[i] < path.back())
+            || uset.find(nums[i]) != uset.end()) {
+            continue;
+    }
+    uset.insert(nums[i]); // 记录这个元素在本层用过了，本层后面不能再用了
+    path.push_back(nums[i]);
+    backtracking(nums, i + 1);
+    path.pop_back();
+}
+```
+
+2. 注意点：-
+3. 完整示例
+
+```c++
+class Solution {
+private:
+    vector<vector<int>> res;
+    vector<int> track;
+public:
+    void backtracking(vector<int>& nums, int startIndex){
+        if(track.size() >= 2){
+            res.push_back(track);
+        }
+
+        unordered_set<int> uset;
+        for(int i = startIndex; i < nums.size(); ++i){
+            // 哪些情况不向 track 中添加元素呢？
+            // 1. 下一个元素比上一个元素小，当 i 为 0 是不进行比较，所以用 !track.empty() 来避开
+            // 2. uset 中重复的元素
+            if((!track.empty() && nums[i] < track.back()) || uset.find(nums[i]) != uset.end()) continue;
+            uset.insert(nums[i]);
+            track.push_back(nums[i]);
+            backtracking(nums, i + 1);
+            track.pop_back();
+        }
+    }
+    vector<vector<int>> findSubsequences(vector<int>& nums) {
+        res.clear();
+        track.clear();
+        backtracking(nums, 0);
+
+        return res;
+    }
+};
+```
+
+4. 时间复杂度：O(n * 2^n)；空间复杂度：O(n)

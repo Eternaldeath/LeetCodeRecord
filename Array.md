@@ -4,6 +4,38 @@
 
 # 简单
 
+## [283. 移动零](https://leetcode.cn/problems/move-zeroes/)
+
+1. 思路
+   1. 使用两个指针，这里用 i，j 表示，其中 i 用来移动非零数组元素，j 每次移动一格，用来表示当前被覆盖的数组位置
+   2. 第一遍，我们从前往后遍历数组，将所有非零的元素按序移动到数组左侧，最终 j 所在的位置就是非零元素和零元素的分界点
+   3. 第二遍，我们从 j 元素开始，将后续的元素赋值为 0，表示将零元素移动到后面
+2. 注意点：最开始我设想按照上述逻辑，可能有同学误以为一遍也可以完成，但是实际上不行，大家可以动手模拟一下 [1,0] 的情况
+3. 完整示例
+
+```c++
+class Solution {
+public:
+    void moveZeroes(vector<int>& nums) {
+        if(nums.size() == 0) return ;
+
+        int j = 0;
+        for(int i = 0; i < nums.size(); i++){
+            if(nums[i] != 0){
+                nums[j] = nums[i];
+                j++;
+            }
+        }
+
+        for(int i = j; i < nums.size(); i++){
+            nums[i] = 0;
+        }
+    }
+};
+```
+
+4. 时间复杂度：O(n)；空间复杂度：O(1)
+
 ## [303. 区域和检索 - 数组不可变](https://leetcode.cn/problems/range-sum-query-immutable/)
 
 1. 思路：采用前缀和算法，将前缀和存入一个数组中，当需要求某个区间的和时，利用 ```preSum[right + 1] - preSum[left]``` 数学逻辑来求得结果
@@ -286,7 +318,47 @@ public:
    1. 时间复杂度：O(n^3^)
    2. 空间复杂度：O(1)
 
+## [48. 旋转图像](https://leetcode.cn/problems/rotate-image/)
 
+1. 思路：本题是一道模拟类型的题目，也就是不涉及算法，但是需要用代码模拟图像旋转的过程
+2. 注意点
+   1. 本题的难点在于题目要求原地操作，在手动模拟的过程中我们知道，直接旋转会导致覆盖问题，使得还没有被使用的元素被覆盖掉，而后续就无法使用了，其实也很好解决，就是利用一个临时变量来存储，并且我们一次 for 循环中模拟的旋转，一次就把四个（假设 size 为 4）旋转过程都模拟完
+
+![](.\img\array\48_01.png)
+
+   2. 第二个注意点是每轮循环的终止条件。我们循环的思路是行循环为外层大循环，列循环为内层循环，实际上可以看到，在一次内循环的时候，多行多列都被处理到了，那么我们的内外循环应该处理到哪一步呢？实际上它们存在如下的逻辑关系，并且这个循环判定考虑到了 `size` 大小为偶数和奇数两种情况
+
+      ![](.\img\array\48_02.png)
+
+      ```c++
+      for(int i = 0; i < n / 2; ++i){
+          for(int j = 0; j < (n+1) / 2; ++j){
+              // ... 
+          }
+      }
+      ```
+
+   3. 完整示例
+
+```c++
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        for(int i = 0; i < n / 2; ++i){
+            for(int j = 0; j < (n+1) / 2; ++j){
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[n - j - 1][i];
+                matrix[n - j - 1][i] = matrix[n - i - 1][n - j - 1];
+                matrix[n - i - 1][n - j - 1] = matrix[j][n - i - 1];
+                matrix[j][n - i - 1] = temp;
+            }
+        }
+    }
+};
+```
+
+4. 时间复杂度：O(n^2^)；空间复杂度：O(1)
 
 ## [209. 长度最小的子数组](https://leetcode.cn/problems/minimum-size-subarray-sum/)
 
