@@ -50,10 +50,12 @@ public:
 
     }
     
+    // 入栈
     void push(int x) {
         que1.push(x);
     }
     
+    // 出栈
     int pop() {
         int que1Size = que1.size();
         que1Size--; // 保留最后一个在 que1 的中元素作为出栈的元素
