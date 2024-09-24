@@ -652,3 +652,67 @@ public:
 4. 时空复杂度
    1. 时间复杂度：O(1)
    2. 空间复杂度：O(n)
+
+# 困难
+
+[76. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
+
+1. 标签：滑动窗口，双指针
+2. 思路
+   1. 设置两个 map，need 用来记录 t，也就是子串的字符，window 用来记录当前窗口中满足 t 的每个字符的个数（记住它是一个 map）。valid 用来记录 window 中符合要求的子串字符的个数
+   2. 当 right < s.size() 也就是右指针没有到原串 s 的尾巴时，right 窗口递增
+   3. 当每次移入的字符满足要求时，window 和 valid 自增
+   4. 当 valid 的大小等于 need.size() 时，说明当前窗口已经包含了子串的所有字符。接着收缩 left，用来找到最优的情况
+3. 完整示例 `参考算法小抄`
+
+```c++
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        // need 存放 t 的映射
+        // window 存放当前窗口中，含有 t 子串字符的个数，可能有重复的，如 ABB 中，BB 就在 window 中重复了
+        unordered_map<char, int> need, window;
+        // 将 t 中的字符映射到 need 中，每个字符（键）对应的数量（值）初始化为 1
+        for(char c : t) need[c]++;
+
+        int start = 0;     // 子串起始位置
+        int len = INT_MAX; // 子串长度
+        int valid = 0;     // window 中符合 need 字符的个数
+
+        int right = 0;
+        int left  = 0;
+
+        while(right < s.size()) {
+            char c = s[right]; // 移入窗口的字符
+            right++;
+
+            if(need.count(c)) {
+                window[c]++;
+                if(window[c] == need[c]) valid++; // 当 window 中字符匹配 need 中字符，则说明需要的字符数量增加
+            }
+
+            while(valid == need.size()){ // 当合法字符数量和 need 字符数量相同，则说明需要收缩寻找最优解
+                // 寻找最小子串
+                if(right - left < len) {
+                    start = left;
+                    len = right - left;
+                }
+
+                char d = s[left]; // 移除窗口的字符
+                left++;                // 缩小窗口
+
+                if(need.count(d)) {
+                    if(window[d] == need[d]) valid--;
+                    window[d]--;
+                }
+
+            }
+        }
+
+        return len == INT_MAX ? "" : s.substr(start, len);
+
+    }
+};
+```
+
+4. 时间复杂度：O(N) 因为每个元素都只会被遍历一遍
