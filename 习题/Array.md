@@ -68,9 +68,12 @@ private:
 
 ## [704. 二分查找](https://leetcode.cn/problems/binary-search/)
 
-1. 思路：本题为一道非常典型的二分查找题，只要掌握基本的原理，并注意边界条件上的细节，配合 debug，就能轻松完成
-2. 注意点：格外注意边界条件，如 while(left <= right) 还是 while(left < right) 等，这里附上一篇[文章](https://www.cnblogs.com/kyoner/p/11080078.html)，对此有非常详细的讨论
-3. 完整示例
+1. 标签：二分法
+2. 思路：本题为一道非常典型的二分查找题，只要掌握基本的原理，并注意边界条件上的细节，配合 debug，就能轻松完成
+3. 注意点：格外注意边界条件，如 while(left <= right) 还是 while(left < right) 等，这里附上一篇[文章](https://www.cnblogs.com/kyoner/p/11080078.html)，对此有非常详细的讨论
+   1. 为什么是 `while(left <= right)`：因为在本例中，对 right 的取值为 nums.size() - 1，也就是查找范围是一个闭区间 [left, right]，我们通过一幅图片来说明![image-20241005183432171](.\img\array\dichotomy.png)
+
+4. 完整示例
 
 ```c++
 class Solution {
@@ -552,9 +555,10 @@ public:
 
 ## [34. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/)
 
-1. 思路：本题是二分查找的变体，即所谓的左右边界的二分查找，它不是去查找一个值，而是数组中重复值的左右边界，我会在拓展与补充部分添加一个写得比较好的文章的链接
-2. 注意点：-
-3. 完整示例
+1. 标签：二分法
+2. 思路：本题是二分查找的变体，即所谓的左右边界的二分查找，它不是去查找一个值，而是数组中重复值的左右边界，我会在拓展与补充部分添加一个写得比较好的文章的链接
+3. 注意点：-
+4. 完整示例
 
 ```c++
 class Solution {
@@ -653,9 +657,60 @@ public:
    1. 时间复杂度：O(1)
    2. 空间复杂度：O(n)
 
+## [567. 字符串的排列](https://leetcode.cn/problems/permutation-in-string/)
+
+1. 标签：滑动窗口，双指针
+2. 思路：设置两个 map，need map 用来映射 s1 中的元素，window map 用来记录当前窗口中符合要求字符元素的个数，valid 用来记录 window 中符号要求的排列字符的个数
+3. 完整示例
+
+```cpp
+class Solution {
+public:
+    // 判断 s 中是否存在 t 的排列
+    bool checkInclusion(string t, string s) {
+        unordered_map<char, int> need, window;
+        for (char c : t) {
+            need[c]++;
+        }
+
+        int left = 0, right = 0;
+        int valid = 0;
+        while (right < s.size()) {
+            char c = s[right];
+            right++;
+            // 进行窗口内数据的一系列更新
+            if (need.count(c)) {
+                window[c]++;
+                if (window[c] == need[c])
+                    valid++;
+            }
+
+            // 判断左侧窗口是否要收缩
+            while (right - left >= t.size()) {
+                // 在这里判断是否找到了合法的子串
+                if (valid == need.size())
+                    return true;
+                char d = s[left];
+                left++;
+                // 进行窗口内数据的一系列更新
+                if (need.count(d)) {
+                    if (window[d] == need[d])
+                        valid--;
+                    window[d]--;
+                }
+            }
+        }
+        // 未找到符合条件的子串
+        return false;
+    }
+};
+```
+
+4. 时间复杂度：O(N) 因为每个元素都只会被遍历一遍
+
 # 困难
 
-[76. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
+## [76. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
 
 1. 标签：滑动窗口，双指针
 2. 思路

@@ -78,6 +78,40 @@ public:
 
 # 中等
 
+## [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)
+
+1. 标签：滑动窗口
+2. 思路：基础思路还是利用滑动窗口算法，关键点在于当 right 向右扩大时，len（无重复字符的子串长度）也增加，当遇到重复字符时，left 向右扩大（也就是窗口缩小），通过更新 len 达到目的
+3. 完整实例
+
+```cpp
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int left = 0;
+        int right = 0;
+        int newlen = 0;
+        int len = 0;
+
+        while (right < s.size()) {
+            char c = s[right];
+            right++;
+            window[c]++;
+            while (window[c] > 1) {
+                char c = s[left];
+                left++;
+                window[c]--;
+            }
+            newlen = right - left;
+            if(newlen > len) len = newlen;
+        }
+        return res;
+    }
+};
+```
+
+
+
 ## [5. 最长回文子串](https://leetcode.cn/problems/longest-palindromic-substring/)
 
 1. 思路：本题采用动态规划的方式
