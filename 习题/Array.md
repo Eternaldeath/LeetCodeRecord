@@ -175,6 +175,48 @@ public:
    1. 时间复杂度：O(n)
    2. 空间复杂度：O(1)，仅需要额外开辟一个常量的新的 vector 空间
 
+## [LCR 179. 查找总价格为目标值的两个商品](https://leetcode.cn/problems/he-wei-sde-liang-ge-shu-zi-lcof/)
+
+1. 标签：双指针，左右指针
+2. 思路
+   1. 左右指针分别指向两端
+   2. 若二者之和等于 target 则返回
+   3. 若二者之和小于 target 则让 left++
+   4. 若二者之和大于 target 则让 right--
+3. 示例代码
+
+```c
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+int* twoSum(int* price, int priceSize, int target, int* returnSize) {
+    int left = 0;
+    int right = priceSize - 1;
+    int *arr = (int *)malloc(sizeof(int) * 2);
+    arr[0] = 0;
+    arr[1] = 0;
+
+    printf("%d, %d\n", price[left], price[right]);
+
+    while (left != right) {
+        if (price[left] + price[right] == target) {
+            arr[0] = price[left];
+            arr[1] = price[right];
+            break;
+        } else if (price[left] + price[right] < target) {
+            ++left;
+        } else if (price[left] + price[right] > target) {
+            --right;
+        }
+    }
+
+    *returnSize = 2; // 返回大小
+    return arr;
+}
+```
+
+
+
 # 中等
 
 ## [15. 三数之和](https://leetcode.cn/problems/3sum/)
