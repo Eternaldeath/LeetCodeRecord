@@ -52,3 +52,31 @@ public:
 4. 时空复杂度
    1. 时间复杂度：O(nlogn)
    2. 空间复杂度：O(logn)
+
+## [406. 根据身高重建队列](https://leetcode.cn/problems/queue-reconstruction-by-height/)
+
+1. 思路
+   1. 先根据身高进行降序排序（从高到低），相同身高又按照 ki 升序排列
+   2. 然后准备一个输出的二维数组（如，二维 vector），以 ki 为标准，每次 insert 到 vector 中 ki 的位置
+2. 注意点：为什么【思路】中，第二点可行呢？首先 insert 的方式是，你插入第 i 个位置，那么本来第 i 个位置及以后的元素就后移。又因为【思路】1 中已经按照身高降序排列了，所以再按照 ki 进行插入时，一定前面的元素大于等于 hi
+3. 完整示例
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> reconstructQueue(vector<vector<int>>& people) {
+        sort(people.begin(), people.end(), [](const vector<int>& u, const vector<int>& v) {
+            return u[0] > v[0] || (u[0] == v[0] && u[1] < v[1]);
+        });
+        vector<vector<int>> ans;
+        for (const vector<int>& person: people) {
+            ans.insert(ans.begin() + person[1], person);
+        }
+        return ans;
+    }
+};
+```
+
+4. 时空复杂度
+   1. 时间复杂度：O(n^2^)
+   2. 空间复杂度：O(logn})
