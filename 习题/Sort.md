@@ -80,3 +80,27 @@ public:
 4. 时空复杂度
    1. 时间复杂度：O(n^2^)
    2. 空间复杂度：O(logn})
+
+## [621. 任务调度器](https://leetcode.cn/problems/task-scheduler/)
+
+1. 思路：使用桶排序的方式来进行判断，然后通过这个判断，找出两种情况下的计算方式即可
+2. 完整示例
+
+```cpp
+int leastInterval(vector<char>& tasks, int n) {
+    // 任务数量
+    int len = tasks.size();
+    vector<int> vec(26);
+    // 统计每个同类型任务的数量
+    for (char c : tasks) ++vec[c - 'A'];
+    // 对任务按数量进行排序
+    sort(vec.begin(), vec.end(), greater<char>());
+    int cnt = 1;
+    // 统计需要添加到最后一个桶的任务数量，统计的标准是和最大任务数量相同的任务个数
+    while (cnt < vec.size() && vec[cnt] == vec[0]) cnt++;
+    // 如果任务数量超过了冷却时间，那么 cpu 充分利用，时间为任务数量
+    // 反之，cpu 存在冷却时间，时间为 (最大任务数量 - 1)*(n + 1) + 最大数量任务个数
+    return max(len, cnt + (n + 1) * (vec[0] - 1));
+}
+```
+
